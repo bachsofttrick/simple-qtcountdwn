@@ -29,6 +29,7 @@ void cd_gui::on_lang_clicked(){
         if (t > 0){
             ui->title->setText("Đồng hồ đếm lùi");
         }
+        cout << "Da doi ngon ngu" << endl;
     } else {
         ui->lang->setText("EN");
         vn = 0;
@@ -39,6 +40,7 @@ void cd_gui::on_lang_clicked(){
         if (t > 0){
             ui->title->setText("Countdown Timer");
         }
+        cout << "Language switched" << endl;
     }
 }
 
@@ -73,72 +75,37 @@ void cd_gui::on_speedSet_clicked(){
 void cd_gui::on_exit_clicked()
 {
     qApp->quit(); //quit
+    cout << "." << endl;
 }
 
 //action for day settings
-void cd_gui::on_add1Day_clicked(){
+void cd_gui::on_add1Day_clicked(){ //when +1 day is clicked
     if (!x10mode){ //check for x10 mode
-        if (checkValueForx1(days, 99)){ //check days in x1 mode
-            days = days + 1;
-            updateDisplay();
-            ui->sub1Day->setEnabled(1); //turn on button when days is 0 < days < 99
-        }
-        if (days >= 99){
-            ui->add1Day->setEnabled(0); //turn off button when days >= 99
-        }
+        t = t + 86400;
+        configTimex1();
     } else {
-        if (checkValueForx10Add(days, 89)){ //check value in x10 mode
-            days = days + 10;
-            updateDisplay();
-            ui->sub1Day->setEnabled(1);
-        }
-        if (days >= 90){
-            ui->add1Day->setEnabled(0); //turn off button when days >= 90
-        }
+        t = t + 864000;
+        configTimex10();
     }
 }
-void cd_gui::on_sub1Day_clicked(){
+void cd_gui::on_sub1Day_clicked(){ //when -1 day is clicked
     if (!x10mode){ //check for x10 mode
-        if (checkValueForx1(days,99)){ //check value in x1 mode
-            days = days - 1;
-            updateDisplay();
-            ui->add1Day->setEnabled(1); //turn on button when days is 0 < days < 99
-        }
-        if (days<=0){
-            ui->sub1Day->setEnabled(0); //turn off button when days <= 0
-        }
+        t = t - 86400;
+        configTimex1();
     } else {
-        if (checkValueForx10Sub(days, 99)){ //check value in x10 mode
-            days = days - 10;
-            updateDisplay();
-            ui->add1Day->setEnabled(1);
-        }
-        if (days<10){
-            ui->sub1Day->setEnabled(0); //turn off button when days < 10
-        }
-        }
+        t = t - 864000;
+        configTimex10();
+    }
 }
 
 //action for hour settings
-void cd_gui::on_add1Hour_clicked(){
+void cd_gui::on_add1Hour_clicked(){ //when +1 hour is clicked
     if (!x10mode && !sp){ //check for x10 mode
-        if (checkValueForx1(hours, 23)){ //check hours in x1 mode
-            hours = hours + 1;
-            updateDisplay();
-            ui->sub1Hour->setEnabled(1); //turn on button when hours is 0 < hours < 23
-        }
-        if (hours >= 23){
-            ui->add1Hour->setEnabled(0); //turn off button when hours >= 23
-        }
+        t = t + 3600;
+        configTimex1();
     } else if (x10mode && !sp){
-        if (checkValueForx10Add(hours, 19)){ //check value in x10 mode
-            hours = hours + 10;
-            updateDisplay();
-            ui->sub1Hour->setEnabled(1);
-        }
-        if (hours >= 20){
-            ui->add1Hour->setEnabled(0); //turn off button when hours >= 20
-        }
+        t = t + 36000;
+        configTimex10();
     }
 
     //this is for speed settings: +10s
@@ -147,25 +114,13 @@ void cd_gui::on_add1Hour_clicked(){
         configButtonOnSpeed();
     }
 }
-void cd_gui::on_sub1Hour_clicked(){
+void cd_gui::on_sub1Hour_clicked(){ //when -1 hour is clicked
     if (!x10mode && !sp){ //check for x10 mode
-        if (checkValueForx1(hours,23)){ //check value in x1 mode
-            hours = hours - 1;
-            updateDisplay();
-            ui->add1Hour->setEnabled(1); //turn on button when hours is 0 < hours < 23
-        }
-        if (hours<=0){
-            ui->sub1Hour->setEnabled(0); //turn off button when hours <= 0
-        }
+        t = t - 3600;
+        configTimex1();
     } else if (x10mode && !sp){
-        if (checkValueForx10Sub(hours, 23)){ //check value in x10 mode
-            hours = hours - 10;
-            updateDisplay();
-            ui->add1Hour->setEnabled(1);
-        }
-        if (hours<10){
-            ui->sub1Hour->setEnabled(0); //turn off button when hours < 10
-        }
+        t = t - 36000;
+        configTimex10();
     }
 
     //this is for speed settings: -10s
@@ -178,23 +133,11 @@ void cd_gui::on_sub1Hour_clicked(){
 //action for minute settings
 void cd_gui::on_add1Minute_clicked(){ //when +1 minute is clicked
     if (!x10mode && !sp){ //check for x10 mode
-        if (checkValueForx1(minutes, 59)){ //check minutes in x1 mode
-            minutes = minutes + 1;
-            updateDisplay();
-            ui->sub1Minute->setEnabled(1); //turn on button when minutes is 0 < minutes < 59
-        }
-        if (minutes >= 59){
-            ui->add1Minute->setEnabled(0); //turn off button when minutes >= 59
-        }
+        t = t + 60;
+        configTimex1();
     } else if (x10mode && !sp){
-        if (checkValueForx10Add(minutes, 49)){ //check value in x10 mode
-            minutes = minutes + 10;
-            updateDisplay();
-            ui->sub1Minute->setEnabled(1);
-        }
-        if (minutes >= 50){
-            ui->add1Minute->setEnabled(0); //turn off button when minutes >= 50
-        }
+        t = t + 600;
+        configTimex10();
     }
 
     //this is for speed settings: +1s
@@ -205,23 +148,11 @@ void cd_gui::on_add1Minute_clicked(){ //when +1 minute is clicked
 }
 void cd_gui::on_sub1Minute_clicked(){ //when -1 minute is clicked
     if (!x10mode && !sp){ //check for x10 mode
-        if (checkValueForx1(minutes,59)){ //check value in x1 mode
-            minutes = minutes - 1;
-            updateDisplay();
-            ui->add1Minute->setEnabled(1); //turn on button when minutes is 0 < minutes < 59
-        }
-        if (minutes<=0){
-            ui->sub1Minute->setEnabled(0); //turn off button when minutes <= 0
-        }
+        t = t - 60;
+        configTimex1();
     } else if (x10mode && !sp){
-        if (checkValueForx10Sub(minutes, 59)){ //check value in x10 mode
-            minutes = minutes - 10;
-            updateDisplay();
-            ui->add1Minute->setEnabled(1);
-        }
-        if (minutes<10){
-            ui->sub1Minute->setEnabled(0); //turn off button when minutes < 10
-        }
+        t = t - 600;
+        configTimex10();
     }
 
     //this is for speed settings: -1s
@@ -234,23 +165,11 @@ void cd_gui::on_sub1Minute_clicked(){ //when -1 minute is clicked
 //action for second settings
 void cd_gui::on_add1Second_clicked(){ //when +1 second is clicked
     if (!x10mode && !sp){ //check for x10 mode
-        if (checkValueForx1(seconds, 59)){ //check seconds in x1 mode
-            seconds = seconds + 1;
-            updateDisplay();
-            ui->sub1Second->setEnabled(1); //turn on button when seconds is 0 < seconds < 59
-        }
-        if (seconds >= 59){
-            ui->add1Second->setEnabled(0); //turn off button when seconds >= 59
-        }
+        t = t + 1;
+        configTimex1();
     } else if (x10mode && !sp){
-        if (checkValueForx10Add(seconds, 49)){ //check value in x10 mode
-            seconds = seconds + 10;
-            updateDisplay();
-            ui->sub1Second->setEnabled(1);
-        }
-        if (seconds >= 50){
-            ui->add1Second->setEnabled(0); //turn off button when seconds >= 50
-        }
+        t = t + 10;
+        configTimex10();
     }
 
     //this is for speed settings: +100ms
@@ -261,23 +180,11 @@ void cd_gui::on_add1Second_clicked(){ //when +1 second is clicked
 }
 void cd_gui::on_sub1Second_clicked(){ //when -1 second is clicked
     if (!x10mode && !sp){ //check for x10 mode
-        if (checkValueForx1(seconds,59)){ //check value in x1 mode
-            seconds = seconds - 1;
-            updateDisplay();
-            ui->add1Second->setEnabled(1); //turn on button when seconds is 0 < seconds < 59
-        }
-        if (seconds<=0){
-            ui->sub1Second->setEnabled(0); //turn off button when seconds <= 0
-        }
+        t = t - 1;
+        configTimex1();
     } else if (x10mode && !sp){
-        if (checkValueForx10Sub(seconds, 59)){ //check value in x10 mode
-            seconds = seconds - 10;
-            updateDisplay();
-            ui->add1Second->setEnabled(1);
-        }
-        if (seconds<10){
-            ui->sub1Second->setEnabled(0); //turn off button when seconds < 10
-        }
+        t = t - 10;
+        configTimex10();
     }
 
     //this is for speed settings: -100ms
@@ -292,6 +199,7 @@ void cd_gui::on_startTime_clicked(){
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(updateTime()));
     timer->start(speed);
+    printTimeToConsole();
     disableSettings();
     //disable speed settings
     ui->speedSet->setEnabled(0);
@@ -300,6 +208,11 @@ void cd_gui::on_startTime_clicked(){
 //action for stop button
 void cd_gui::on_stopTime_clicked(){
     timer->stop();
+    if (!vn){
+        cout << "\nTime stopped." << endl;
+    } else {
+        cout << "\nDung dong ho." << endl;
+    }
     enableSettings();
     ui->title->setStyleSheet("QLabel { color : black; }");
     if (!vn){
@@ -327,52 +240,14 @@ void cd_gui::on_add10Time_clicked(){
         ui->add10Time->setText("+10"); //change label
 
         //check if days, hours, minutes, seconds are out of range in x10 mode
-        if (days > 0 && days < 10){
-            ui->sub1Day->setEnabled(0);
-        }
-        if (days >= 90){
-            ui->add1Day->setEnabled(0);
-        }
-        if (hours > 0 && hours < 10){
-            ui->sub1Hour->setEnabled(0);
-        }
-        if (hours >= 20){
-            ui->add1Hour->setEnabled(0);
-        }
-        if (minutes > 0 && minutes < 10){
-            ui->sub1Minute->setEnabled(0);
-        }
-        if (minutes >= 50){
-            ui->add1Minute->setEnabled(0);
-        }
-        if (seconds > 0 && seconds < 10){
-            ui->sub1Second->setEnabled(0);
-        }
-        if (seconds >= 50){
-            ui->add1Second->setEnabled(0);
-        }
+        configTimex10();
 
     } else {
         x10mode = 0; //switch to x1 if previously mode was x10
         ui->add10Time->setText("+1"); //change label
 
         //check if days, hours, minutes, seconds are out of range in x1 mode
-        if (checkValueSwitchMode(days, 90, 99)){
-            ui->add1Day->setEnabled(1);
-            ui->sub1Day->setEnabled(1);
-        }
-        if (checkValueSwitchMode(hours, 20, 23)){
-            ui->add1Hour->setEnabled(1);
-            ui->sub1Hour->setEnabled(1);
-        }
-        if (checkValueSwitchMode(minutes, 50, 59)){
-            ui->add1Minute->setEnabled(1);
-            ui->sub1Minute->setEnabled(1);
-        }
-        if (checkValueSwitchMode(seconds, 50, 59)){
-            ui->add1Second->setEnabled(1);
-            ui->sub1Second->setEnabled(1);
-        }
+        configTimex1();
 
     }
 }
@@ -390,63 +265,71 @@ void cd_gui::resetTime(){
     } else {
         ui->title->setText("Đồng hồ đếm lùi");
     }
-    ui->add1Day->setEnabled(1);
-    ui->sub1Day->setEnabled(0);
-    ui->add1Hour->setEnabled(1);
-    ui->sub1Hour->setEnabled(0);
-    // +/- 1 minute doesn't need to be adjusted because default is 0 day and 1 minute
-    ui->add1Second->setEnabled(1);
-    ui->sub1Second->setEnabled(0);
+    //reset buttons according to x1 or x10
+    if (!sp){
+        configTimex1();
+    } else {
+        configTimex10();
+    }
 }
 
-//update display
+//update time on display
 void cd_gui::updateDisplay(){
+    //change to display value
+    days = t / 86400;
+    hours = t % 86400 / 3600;
+    minutes = t % 3600 / 60;
+    seconds = t % 60;
     ui->days->display(days);
-    ui->hours->display(hours);
-    ui->minutes->display(minutes);
-    ui->seconds->display(seconds);
-}
 
-//check condition if time value is within range
-bool cd_gui::checkValueForx1(short int x,short int y){ // this one for x1 mode
-    return (x >= 0 && x <= y);
-}
-bool cd_gui::checkValueForx10Add(short int x, short int y){ //this one for x10 mode add
-    return (x >= 0 && x <= y);
-}
-bool cd_gui::checkValueForx10Sub(short int x, short int y){ //this one for x10 mode subtract
-    return (x >= 10 && x <= y);
-}
-bool cd_gui::checkValueSwitchMode(short int x, short int y, short int z){ //check value whenever x10 -> x1
-    return ((x > 0 && x < 10) || (x >= y && x < z));
+    if (hours < 10){
+        twoZero[1]= '0' + hours;
+        ui->hours->display(twoZero);
+        twoZero[1]= '0';
+    } else {
+        ui->hours->display(hours);
+    }
+
+    if (minutes < 10){
+        twoZero[1]= '0' + minutes;
+        ui->minutes->display(twoZero);
+        twoZero[1]= '0';
+    } else {
+        ui->minutes->display(minutes);
+    }
+
+    if (seconds < 10){
+        twoZero[1]= '0' + seconds;
+        ui->seconds->display(twoZero);
+        twoZero[1]= '0';
+    } else {
+        ui->seconds->display(seconds);
+    }
 }
 
 //update Timer
 void cd_gui::updateTime(){
-    //change all values to lowest unit
-    t = days*86400 + hours*3600 + minutes*60 + seconds;
     //remove 1 unit every second
     t = t - 1;
     if (t > 0){
         //this is for blinking colon
         if (t % 2 == 1){
+            colon = ' ';
             ui->colon1->setText("");
             ui->colon2->setText("");
             ui->colon3->setText("");
         } else {
+            colon = ':';
             ui->colon1->setText(":");
             ui->colon2->setText(":");
             ui->colon3->setText(":");
         }
-        //change back to display value
-        days = t / 86400;
-        hours = t % 86400 / 3600;
-        minutes = t % 3600 / 60;
-        seconds = t % 60;
         updateDisplay();
+        printTimeToConsole();
     } else { //time's up
-        seconds = 0;
+        t = 0;
         updateDisplay();
+        printTimeToConsole();
         ui->colon1->setText(":");
         ui->colon2->setText(":");
         ui->colon3->setText(":");
@@ -489,48 +372,13 @@ void cd_gui::enableSettings(){
     ui->colon1->setText(":");
     ui->colon2->setText(":");
     ui->colon3->setText(":");
-    //buttons for adjusting Timer
-    ui->add1Day->setEnabled(1);
-    ui->sub1Day->setEnabled(1);
-    ui->add1Hour->setEnabled(1);
-    ui->sub1Hour->setEnabled(1);
-    ui->add1Minute->setEnabled(1);
-    ui->sub1Minute->setEnabled(1);
-    ui->add1Second->setEnabled(1);
-    ui->sub1Second->setEnabled(1);
 
     if (!x10mode){
-
         //condition for x1 mode. Note if any value = limit, the +/- will be disabled accordingly
-        //days
-        if (days >= 99) {ui->add1Day->setEnabled(0);}
-        if (days <= 0) {ui->sub1Day->setEnabled(0);}
-        //hours
-        if (hours >= 23) {ui->add1Hour->setEnabled(0);}
-        if (hours <= 0) {ui->sub1Hour->setEnabled(0);}
-        //minutes
-        if (minutes >= 59) {ui->add1Minute->setEnabled(0);}
-        if (minutes <= 0) {ui->sub1Minute->setEnabled(0);}
-        //seconds
-        if (seconds >= 59) {ui->add1Second->setEnabled(0);}
-        if (seconds <= 0) {ui->sub1Second->setEnabled(0);}
-
+        configTimex1();
     } else {
-
         //condition for x10 mode. Note if any value = limit, the +/- will be disabled accordingly
-        //days
-        if (days >= 90) {ui->add1Day->setEnabled(0);}
-        if (days < 10) {ui->sub1Day->setEnabled(0);}
-        //hours
-        if (hours >= 20) {ui->add1Hour->setEnabled(0);}
-        if (hours < 10) {ui->sub1Hour->setEnabled(0);}
-        //minutes
-        if (minutes >= 50) {ui->add1Minute->setEnabled(0);}
-        if (minutes < 10) {ui->sub1Minute->setEnabled(0);}
-        //seconds
-        if (seconds >= 50) {ui->add1Second->setEnabled(0);}
-        if (seconds < 10) {ui->sub1Second->setEnabled(0);}
-
+        configTimex10();
     }
 
     //menu below
@@ -546,8 +394,9 @@ void cd_gui::updateSpeed(){
     ui->seconds->display(speed % 1000 / 10);
 }
 
-//button config: hour for +10 seconds, minute for +1 second, second for +100 msec
+//button config for speed settings: hour for +10 seconds, minute for +1 second, second for +100 msec
 void cd_gui::configButtonOnSpeed(){
+    cout << speed << "ms/tick" << endl;
     ui->add1Hour->setEnabled(1);
     ui->add1Minute->setEnabled(1);
     ui->add1Second->setEnabled(1);
@@ -576,4 +425,113 @@ void cd_gui::configButtonOnSpeed(){
         ui->add1Hour->setEnabled(0);
     }
     updateSpeed();
+}
+
+//button config for time settings in x1 mode
+void cd_gui::configTimex1(){
+    cout << "t= " << t << endl;
+
+    ui->add1Day->setEnabled(1);
+    ui->add1Hour->setEnabled(1);
+    ui->add1Minute->setEnabled(1);
+    ui->add1Second->setEnabled(1);
+    if (t > 0){
+        ui->sub1Second->setEnabled(1);
+    } else {
+        ui->sub1Second->setEnabled(0);
+    }
+    if (t >= 60){
+        ui->sub1Minute->setEnabled(1);
+    } else {
+        ui->sub1Minute->setEnabled(0);
+    }
+    if (t >= 3600){
+        ui->sub1Hour->setEnabled(1);
+    } else {
+        ui->sub1Hour->setEnabled(0);
+    }
+    //if we reach 1 day
+    if (t >= 86400){
+        ui->sub1Day->setEnabled(1);
+    } else {
+        ui->sub1Day->setEnabled(0);
+    }
+    //if we reach 99 days 0:00:00
+    if (t >= 8553600){
+        ui->add1Day->setEnabled(0);
+    }
+    //if we reach 99 days 23:00:00
+    if (t >= 8636400){
+        ui->add1Hour->setEnabled(0);
+    }
+    //if we reach 99 days 23:59:00
+    if (t >= 8639940){
+        ui->add1Minute->setEnabled(0);
+    }
+    //if we reach 99 days 23:59:59
+    if (t >= 8639999){
+        ui->add1Second->setEnabled(0);
+    }
+    updateDisplay();
+}
+
+//button config for time settings x10 mode
+void cd_gui::configTimex10(){
+    cout << "[x10 mode] t= " << t << endl;
+
+    ui->add1Day->setEnabled(1);
+    ui->add1Hour->setEnabled(1);
+    ui->add1Minute->setEnabled(1);
+    ui->add1Second->setEnabled(1);
+    if (t >= 10){
+        ui->sub1Second->setEnabled(1);
+    } else {
+        ui->sub1Second->setEnabled(0);
+    }
+    //if we reach 0 day 0:10:00
+    if (t >= 600){
+        ui->sub1Minute->setEnabled(1);
+    } else {
+        ui->sub1Minute->setEnabled(0);
+    }
+    //if we reach 0 day 10:00:00
+    if (t >= 36000){
+        ui->sub1Hour->setEnabled(1);
+    } else {
+        ui->sub1Hour->setEnabled(0);
+    }
+    //if we reach 10 days 0:00:00
+    if (t >= 864000){
+        ui->sub1Day->setEnabled(1);
+    } else {
+        ui->sub1Day->setEnabled(0);
+    }
+    //if we reach 90 days 0:00:00
+    if (t >= 7776000){
+        ui->add1Day->setEnabled(0);
+    }
+    //if we reach 99 days 14:00:00
+    if (t >= 8604000){
+        ui->add1Hour->setEnabled(0);
+    }
+    //if we reach 99 days 23:50:00
+    if (t >= 8639400){
+        ui->add1Minute->setEnabled(0);
+    }
+    //if we reach 99 days 23:59:50
+    if (t >= 8639990){
+        ui->add1Second->setEnabled(0);
+    }
+    updateDisplay();
+}
+
+//output time remaining to console
+void cd_gui::printTimeToConsole(){
+    //this is for blinking colon
+    if (t % 2 == 1){
+        colon = ' ';
+    } else {
+        colon = ':';
+    }
+    cout << "Time Remaining " << days << "d " << setfill('0') << setw(2) << hours << colon << setw(2) << minutes << colon << setw(2) << seconds << "\r" << flush;
 }
