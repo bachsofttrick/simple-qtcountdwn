@@ -5,3 +5,4 @@ It support 2 languages: English and Vietnamese. Make sure your system supports U
 
 ## Note:
 Code has been updated to include options for fullscreen or windowed
+This version is for AM335x Starter Kit. It will be included with LED and button interactions.
