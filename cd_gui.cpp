@@ -1,5 +1,6 @@
 #include "cd_gui.h"
 #include "ui_cd_gui.h"
+#include "blink-led.h"
 #include <QTimer>
 
 cd_gui::cd_gui(QWidget *parent) :
@@ -8,8 +9,20 @@ cd_gui::cd_gui(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->stopTime->setEnabled(0); //disable stop button in startup
+
+    //initialize timer to read button status
+    button = new QTimer(this);
+    connect(button, SIGNAL(timeout()), this, SLOT(buttonRead()));
+    button->start(180);
+    //setup for LEDs and buttons
+    initial_iosetup();
+
     resetTime(); //reset Timer
     updateDisplay(); //update display
+
+    //initialize timer for countdown (not active)
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(updateTime()));
 }
 
 cd_gui::~cd_gui()
@@ -75,6 +88,7 @@ void cd_gui::on_speedSet_clicked(){
 void cd_gui::on_exit_clicked()
 {
     qApp->quit(); //quit
+    unmap_io();
     cout << "." << endl;
 }
 
@@ -196,9 +210,8 @@ void cd_gui::on_sub1Second_clicked(){ //when -1 second is clicked
 
 //action for start button
 void cd_gui::on_startTime_clicked(){
-    timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(updateTime()));
     timer->start(speed);
+    ledTimeChange();
     printTimeToConsole();
     disableSettings();
     //disable speed settings
@@ -326,15 +339,17 @@ void cd_gui::updateTime(){
         }
         updateDisplay();
         printTimeToConsole();
+        ledTimeChange();
     } else { //time's up
         t = 0;
         updateDisplay();
         printTimeToConsole();
+        ledTimeChange();
         ui->colon1->setText(":");
         ui->colon2->setText(":");
         ui->colon3->setText(":");
         //display timeout message
-        ui->title->setText("Insert message here");
+        ui->title->setText("Time's up");
         //change color to emphasize message
         if (!red){
             ui->title->setStyleSheet("QLabel { color : red; }");
@@ -534,4 +549,70 @@ void cd_gui::printTimeToConsole(){
         colon = ':';
     }
     cout << "Time Remaining " << days << "d " << setfill('0') << setw(2) << hours << colon << setw(2) << minutes << colon << setw(2) << seconds << "\r" << flush;
+}
+
+//change LED status in countdown
+void cd_gui::ledTimeChange(){
+    if (t % 5 == 4){
+        gpio_set(GPIO_MODULE1, USR0_LED_D1);
+        gpio_set(GPIO_MODULE1, USR1_LED_D2);
+        gpio_set(GPIO_MODULE1, USR2_LED_D3);
+        gpio_set(GPIO_MODULE1, USR3_LED_D4);
+    }
+    if (t % 5 == 3){
+        gpio_set(GPIO_MODULE1, USR0_LED_D1);
+        gpio_set(GPIO_MODULE1, USR1_LED_D2);
+        gpio_set(GPIO_MODULE1, USR2_LED_D3);
+        gpio_reset(GPIO_MODULE1, USR3_LED_D4);
+    }
+    if (t % 5 == 2){
+        gpio_set(GPIO_MODULE1, USR0_LED_D1);
+        gpio_set(GPIO_MODULE1, USR1_LED_D2);
+        gpio_reset(GPIO_MODULE1, USR2_LED_D3);
+        gpio_reset(GPIO_MODULE1, USR3_LED_D4);
+    }
+    if (t % 5 == 1){
+        gpio_set(GPIO_MODULE1, USR0_LED_D1);
+        gpio_reset(GPIO_MODULE1, USR1_LED_D2);
+        gpio_reset(GPIO_MODULE1, USR2_LED_D3);
+        gpio_reset(GPIO_MODULE1, USR3_LED_D4);
+    }
+    if (t % 5 == 0){
+        gpio_reset(GPIO_MODULE1, USR0_LED_D1);
+        gpio_reset(GPIO_MODULE1, USR1_LED_D2);
+        gpio_reset(GPIO_MODULE1, USR2_LED_D3);
+        gpio_reset(GPIO_MODULE1, USR3_LED_D4);
+    }
+}
+
+//read buttons
+void cd_gui::buttonRead(){
+    //start and stop countdown
+    if ( gpio_read(GPIO_MODULE2, IN, USR0_KEY_SW1) ){
+        if (!timer->isActive()){
+            on_startTime_clicked();
+        } else {
+            on_stopTime_clicked();
+        }
+    }
+
+    if ( gpio_read(GPIO_MODULE2, IN, USR1_KEY_SW2) )
+        if (!timer->isActive()){
+            on_add1Second_clicked();
+        }
+
+    if ( gpio_read(GPIO_MODULE0, IN, USR2_KEY_SW3) )
+        if (!timer->isActive()){
+            on_sub1Second_clicked();
+            if (t < 0){
+                t = 0;
+                cout << "Reset t= " << t << endl;
+                updateDisplay();
+            }
+        }
+
+    if ( gpio_read(GPIO_MODULE2, IN, USR3_KEY_SW4) )
+        if (!timer->isActive()){
+            on_add10Time_clicked();
+        }
 }

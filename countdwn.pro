@@ -25,10 +25,12 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        cd_gui.cpp
+        cd_gui.cpp \
+        blink-led.c \
 
 HEADERS += \
-        cd_gui.h
+        cd_gui.h \
+        blink-led.h \
 
 FORMS += \
         cd_gui.ui

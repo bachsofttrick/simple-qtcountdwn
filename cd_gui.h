@@ -49,19 +49,23 @@ private slots:
     void configTimex1();
     void configTimex10();
     void printTimeToConsole();
+    void ledTimeChange();
+    void buttonRead();
 
 private:
     Ui::cd_gui *ui;
+    QTimer *button; //declare timer for button read
     QTimer *timer; //declare timer for update Timer
     int t; //declare total time
     int speed = 1000; //declare default Timer speed
     short int days,hours,minutes,seconds; //declare variable to display (easier to see when coding)
     char colon = ':'; //blinking colon
-    QString twoZero = "00";
+    QString twoZero = "00"; //for display with value < 10
     bool x10mode = 0; //variable for add 10 mode
     bool red = 0; //change to red color when timeout
     bool vn = 0; //change language
     bool sp = 0; //switch to speed settings
+    short int funcButton = 0; //switch between adjusting seconds, minutes, hours, days, speed
 };
 
 #endif // CD_GUI_H
