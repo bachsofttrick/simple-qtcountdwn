@@ -4,4 +4,4 @@ It can run up to 99 days with adjustable speed from 100 milliseconds to 60 secon
 It support 2 languages: English and Vietnamese. Make sure your system supports Unicode.
 
 ## Note:
-Because it was originally written for AM335x Starter Kit with a screen of 480x272, to get code for a window-sized version, check out windowSize branch.
+Code has been updated to include options for fullscreen or windowed

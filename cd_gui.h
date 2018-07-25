@@ -41,14 +41,6 @@ private slots:
     void on_add10Time_clicked();
     void resetTime();
     void updateDisplay();
-
-    /* old
-    bool checkValueForx1(short int x, short int y);
-    bool checkValueForx10Add(short int x, short int y);
-    bool checkValueForx10Sub(short int x, short int y);
-    bool checkValueSwitchMode(short int x, short int y, short int z);
-    */
-
     void updateTime();
     void disableSettings();
     void enableSettings();
