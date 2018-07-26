@@ -9,6 +9,8 @@ cd_gui::cd_gui(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->stopTime->setEnabled(0); //disable stop button in startup
+    resetTime(); //reset Timer
+    updateDisplay(); //update display
 
     //initialize timer to read button status
     button = new QTimer(this);
@@ -17,12 +19,12 @@ cd_gui::cd_gui(QWidget *parent) :
     //setup for LEDs and buttons
     initial_iosetup();
 
-    resetTime(); //reset Timer
-    updateDisplay(); //update display
-
     //initialize timer for countdown (not active)
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(updateTime()));
+
+    //load timeout message to program
+    timeOutMsg = loadTimeOutMsg();
 }
 
 cd_gui::~cd_gui()
@@ -349,7 +351,7 @@ void cd_gui::updateTime(){
         ui->colon2->setText(":");
         ui->colon3->setText(":");
         //display timeout message
-        ui->title->setText("Time's up");
+        ui->title->setText(timeOutMsg);
         //change color to emphasize message
         if (!red){
             ui->title->setStyleSheet("QLabel { color : red; }");
@@ -615,4 +617,33 @@ void cd_gui::buttonRead(){
         if (!timer->isActive()){
             on_add10Time_clicked();
         }
+}
+
+//load message from text file -> Qt
+QString cd_gui::loadTimeOutMsg(){
+    ifstream fileText;
+    string msg;
+    string fileName = "message.txt";
+    QString Qmsg;
+    fileText.open(fileName);
+    if (fileText.is_open()){
+        cout << "Load " << fileName << " successful." << endl;
+        getline(fileText, msg);
+
+        //action whether message is too long or empty
+        if (msg.size() > 19) {
+            cout << "Message is too long." << endl;
+        } else if (msg.size() < 1) {
+            cout << "File is empty. Use default message." << endl;
+            msg = "Time's up";
+        }
+
+        fileText.close();
+     } else {
+        cout << "Failed to load " << fileName << "." << endl;
+        cout << "Proceed with default timeout message." << endl;
+        msg = "Time's up";
+     }
+    Qmsg = QString::fromStdString(msg);
+    return Qmsg;
 }

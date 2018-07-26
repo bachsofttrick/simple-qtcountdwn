@@ -4,6 +4,10 @@
 #include <QMainWindow>
 #include <QString>
 
+//library for loading text file
+#include <fstream>
+#include <string>
+
 //library for the leading 0 (01:02:03)
 #include <iomanip>
 
@@ -51,6 +55,7 @@ private slots:
     void printTimeToConsole();
     void ledTimeChange();
     void buttonRead();
+    QString loadTimeOutMsg();
 
 private:
     Ui::cd_gui *ui;
@@ -61,6 +66,7 @@ private:
     short int days,hours,minutes,seconds; //declare variable to display (easier to see when coding)
     char colon = ':'; //blinking colon
     QString twoZero = "00"; //for display with value < 10
+    QString timeOutMsg; //message when timeout
     bool x10mode = 0; //variable for add 10 mode
     bool red = 0; //change to red color when timeout
     bool vn = 0; //change language
