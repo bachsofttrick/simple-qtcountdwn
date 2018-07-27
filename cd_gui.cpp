@@ -640,10 +640,23 @@ QString cd_gui::loadTimeOutMsg(){
 
         fileText.close();
      } else {
-        cout << "Failed to load " << fileName << "." << endl;
+        cout << "Failed to load " << fileName << endl;
         cout << "Proceed with default timeout message." << endl;
         msg = "Time's up";
+        ofstream fileText ("message.txt");
+        fileText << msg;
+        cout << "Created new " << fileName << endl;
      }
     Qmsg = QString::fromStdString(msg);
     return Qmsg;
+}
+
+//load previous saved time remaining
+int cd_gui::loadTimeRemain(){
+    ifstream timeFile;
+    string fileName = "timerem";
+    timeFile.open(fileName);
+    if (timeFile.is_open()){
+
+    }
 }

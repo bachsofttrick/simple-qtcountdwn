@@ -56,6 +56,7 @@ private slots:
     void ledTimeChange();
     void buttonRead();
     QString loadTimeOutMsg();
+    int loadTimeRemain();
 
 private:
     Ui::cd_gui *ui;
