@@ -243,6 +243,7 @@ void cd_gui::on_stopTime_clicked(){
 void cd_gui::on_resetTime_clicked(){
     if (!sp){
         resetTime();
+        saveTimeRemain();
         updateDisplay();
     } else {
         speed = 1000;
@@ -677,6 +678,15 @@ int cd_gui::loadTimeRemain(){
         timeFile.close();
     } else {
         cout << "Failed to load " << fileName << endl;
+        t_remain = 60;
+        ofstream timeFile (fileName);
+        timeFile << t_remain;
+        timeFile.close();
+        cout << "Created new " << fileName << endl;
+    }
+    //prevent time overflow
+    if (t < 0 || t > 8640000){
+        cout << "Value out of bound (0 < t < 8640000)" << endl;
         t_remain = 60;
         ofstream timeFile (fileName);
         timeFile << t_remain;
