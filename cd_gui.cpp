@@ -64,6 +64,12 @@ void cd_gui::on_lang_clicked(){
 void cd_gui::on_speedSet_clicked(){
     if (!sp){
         sp = 1;
+        //set speed settings for buttons
+        funcButton = 4;
+        ui->fswitch0->setEnabled(1);
+        ui->fswitch1->setEnabled(0);
+        ui->fswitch2->setEnabled(0);
+        ui->fswitch3->setEnabled(0);
 
         //configure buttons for speed settings
         disableSettings();
@@ -80,6 +86,13 @@ void cd_gui::on_speedSet_clicked(){
     } else {
         //switch back to normal
         sp = 0;
+        //set speed settings for buttons
+        funcButton = 0;
+        ui->fswitch0->setEnabled(1);
+        ui->fswitch1->setEnabled(0);
+        ui->fswitch2->setEnabled(0);
+        ui->fswitch3->setEnabled(0);
+
         ui->colon1->setText(":");
         ui->colon2->setText(":");
         updateDisplay();
@@ -603,27 +616,82 @@ void cd_gui::buttonRead(){
 
     if ( gpio_read(GPIO_MODULE2, IN, USR1_KEY_SW2) )
         if (!timer->isActive()){
-            on_add1Minute_clicked();
-            if (t > 8640000){
+            if (funcButton == 0 || funcButton == 4){on_add1Second_clicked();}
+            if (funcButton == 1 || funcButton == 5){on_add1Minute_clicked();}
+            if (funcButton == 2 || funcButton == 6){on_add1Hour_clicked();}
+            //1Day button only works in time settings
+            if (funcButton == 3 && !sp){on_add1Day_clicked();}
+            if (t >= 8640000){
                 t = 8639999;
                 cout << "Reset t= " << t << endl;
                 updateDisplay();
+            }
+            if (speed > 60000 && sp){
+                speed = 60000;
+                cout << "Reset speed= " << speed << endl;
+                updateSpeed();
             }
         }
 
     if ( gpio_read(GPIO_MODULE0, IN, USR2_KEY_SW3) )
         if (!timer->isActive()){
-            on_sub1Minute_clicked();
+            if (funcButton == 0 || funcButton == 4){on_sub1Second_clicked();}
+            if (funcButton == 1 || funcButton == 5){on_sub1Minute_clicked();}
+            if (funcButton == 2 || funcButton == 6){on_sub1Hour_clicked();}
+            //1Day button only works in time settings
+            if (funcButton == 3 && !sp){on_sub1Day_clicked();}
             if (t < 0){
                 t = 0;
                 cout << "Reset t= " << t << endl;
                 updateDisplay();
             }
+            if (speed < 100 && sp){
+                speed = 100;
+                cout << "Reset speed= " << speed << endl;
+                updateSpeed();
+            }
         }
 
+    /*change to settings for seconds(0),minutes(1),hours(2),days(3),
+     * speed +/-0.1s(4),1s(5),10s(6)
+     */
     if ( gpio_read(GPIO_MODULE2, IN, USR3_KEY_SW4) )
         if (!timer->isActive()){
-            on_add10Time_clicked();
+            if (funcButton == 0){
+                funcButton = 1;
+                ui->fswitch0->setEnabled(0);
+                ui->fswitch1->setEnabled(1);
+                ui->fswitch2->setEnabled(0);
+                ui->fswitch3->setEnabled(0);
+            } else if (funcButton == 1){
+                funcButton = 2;
+                ui->fswitch0->setEnabled(0);
+                ui->fswitch1->setEnabled(0);
+                ui->fswitch2->setEnabled(1);
+                ui->fswitch3->setEnabled(0);
+            } else if (funcButton == 2){
+                funcButton = 3;
+                ui->fswitch0->setEnabled(0);
+                ui->fswitch1->setEnabled(0);
+                ui->fswitch2->setEnabled(0);
+                ui->fswitch3->setEnabled(1);
+            } else if (funcButton == 3){
+                on_speedSet_clicked();
+            } else if (funcButton == 4){
+                funcButton = 5;
+                ui->fswitch0->setEnabled(0);
+                ui->fswitch1->setEnabled(1);
+                ui->fswitch2->setEnabled(0);
+                ui->fswitch3->setEnabled(0);
+            } else if (funcButton == 5){
+                funcButton = 6;
+                ui->fswitch0->setEnabled(0);
+                ui->fswitch1->setEnabled(1);
+                ui->fswitch2->setEnabled(1);
+                ui->fswitch3->setEnabled(0);
+            } else if (funcButton == 6){
+                on_speedSet_clicked();
+            }
         }
 }
 
