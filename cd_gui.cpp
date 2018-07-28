@@ -9,7 +9,15 @@ cd_gui::cd_gui(QWidget *parent) :
     ui->setupUi(this);
     ui->stopTime->setEnabled(0); //disable stop button in startup
     resetTime(); //reset Timer
+    t = loadTimeRemain(); //load previous time value
     updateDisplay(); //update display
+
+    //initialize timer for countdown (not active)
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(updateTime()));
+
+    //load timeout message to program
+    timeOutMsg = loadTimeOutMsg();
 }
 
 cd_gui::~cd_gui()
@@ -196,8 +204,6 @@ void cd_gui::on_sub1Second_clicked(){ //when -1 second is clicked
 
 //action for start button
 void cd_gui::on_startTime_clicked(){
-    timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(updateTime()));
     timer->start(speed);
     printTimeToConsole();
     disableSettings();
@@ -213,6 +219,7 @@ void cd_gui::on_stopTime_clicked(){
     } else {
         cout << "\nDung dong ho." << endl;
     }
+    saveTimeRemain();
     enableSettings();
     ui->title->setStyleSheet("QLabel { color : black; }");
     if (!vn){
@@ -226,6 +233,7 @@ void cd_gui::on_stopTime_clicked(){
 void cd_gui::on_resetTime_clicked(){
     if (!sp){
         resetTime();
+        saveTimeRemain();
         updateDisplay();
     } else {
         speed = 1000;
@@ -334,7 +342,7 @@ void cd_gui::updateTime(){
         ui->colon2->setText(":");
         ui->colon3->setText(":");
         //display timeout message
-        ui->title->setText("Insert message here");
+        ui->title->setText(timeOutMsg);
         //change color to emphasize message
         if (!red){
             ui->title->setStyleSheet("QLabel { color : red; }");
@@ -534,4 +542,83 @@ void cd_gui::printTimeToConsole(){
         colon = ':';
     }
     cout << "Time Remaining " << days << "d " << setfill('0') << setw(2) << hours << colon << setw(2) << minutes << colon << setw(2) << seconds << "\r" << flush;
+}
+
+//load message from text file -> Qt
+QString cd_gui::loadTimeOutMsg(){
+    ifstream fileText;
+    string msg;
+    string fileName = "message.txt";
+    QString Qmsg;
+    fileText.open(fileName);
+    if (fileText.is_open()){
+        cout << "Load " << fileName << " successful." << endl;
+        getline(fileText, msg);
+
+        //action whether message is too long or empty
+        if (msg.size() > 19) {
+            cout << "Message is too long." << endl;
+        } else if (msg.size() < 1) {
+            cout << "File is empty. Use default message." << endl;
+            msg = "Time's up";
+        }
+
+        fileText.close();
+     } else {
+        cout << "Failed to load " << fileName << endl;
+        cout << "Proceed with default timeout message." << endl;
+        msg = "Time's up";
+        ofstream fileText (fileName);
+        fileText << msg;
+        fileText.close();
+        cout << "Created new " << fileName << endl;
+     }
+    Qmsg = QString::fromStdString(msg);
+    return Qmsg;
+}
+
+//load previous saved time remaining
+int cd_gui::loadTimeRemain(){
+    //input to read timerem
+    ifstream timeFile;
+    string fileName = "timerem";
+    //remaining time
+    string time;
+    int t_remain;
+    timeFile.open(fileName);
+    if (timeFile.is_open()){
+        cout << "Load " << fileName << " successful." << endl;
+        getline(timeFile, time);
+
+        //turn string to int
+        t_remain = stoi(time);
+        timeFile.close();
+    } else {
+        cout << "Failed to load " << fileName << endl;
+        t_remain = 60;
+        ofstream timeFile (fileName);
+        timeFile << t_remain;
+        timeFile.close();
+        cout << "Created new " << fileName << endl;
+    }
+    //prevent time overflow
+    if (t < 0 || t > 8640000){
+        cout << "Value out of bound (0 < t < 8640000)" << endl;
+        t_remain = 60;
+        ofstream timeFile (fileName);
+        timeFile << t_remain;
+        timeFile.close();
+        cout << "Created new " << fileName << endl;
+    }
+    return t_remain;
+}
+
+//save previous saved time remaining
+void cd_gui::saveTimeRemain(){
+    ofstream timeFile;
+    string fileName = "timerem";
+    timeFile.open(fileName);
+    timeFile << t;
+    timeFile.close();
+    cout << "Saved " << t << "." << endl;
 }
