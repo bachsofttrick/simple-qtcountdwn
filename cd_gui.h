@@ -57,6 +57,7 @@ private slots:
     void buttonRead();
     QString loadTimeOutMsg();
     int loadTimeRemain();
+    void saveTimeRemain();
 
 private:
     Ui::cd_gui *ui;

@@ -10,6 +10,7 @@ cd_gui::cd_gui(QWidget *parent) :
     ui->setupUi(this);
     ui->stopTime->setEnabled(0); //disable stop button in startup
     resetTime(); //reset Timer
+    t = loadTimeRemain(); //load previous time value
     updateDisplay(); //update display
 
     //initialize timer to read button status
@@ -228,6 +229,7 @@ void cd_gui::on_stopTime_clicked(){
     } else {
         cout << "\nDung dong ho." << endl;
     }
+    saveTimeRemain();
     enableSettings();
     ui->title->setStyleSheet("QLabel { color : black; }");
     if (!vn){
@@ -600,12 +602,17 @@ void cd_gui::buttonRead(){
 
     if ( gpio_read(GPIO_MODULE2, IN, USR1_KEY_SW2) )
         if (!timer->isActive()){
-            on_add1Second_clicked();
+            on_add1Minute_clicked();
+            if (t > 8640000){
+                t = 8639999;
+                cout << "Reset t= " << t << endl;
+                updateDisplay();
+            }
         }
 
     if ( gpio_read(GPIO_MODULE0, IN, USR2_KEY_SW3) )
         if (!timer->isActive()){
-            on_sub1Second_clicked();
+            on_sub1Minute_clicked();
             if (t < 0){
                 t = 0;
                 cout << "Reset t= " << t << endl;
@@ -643,8 +650,9 @@ QString cd_gui::loadTimeOutMsg(){
         cout << "Failed to load " << fileName << endl;
         cout << "Proceed with default timeout message." << endl;
         msg = "Time's up";
-        ofstream fileText ("message.txt");
+        ofstream fileText (fileName);
         fileText << msg;
+        fileText.close();
         cout << "Created new " << fileName << endl;
      }
     Qmsg = QString::fromStdString(msg);
@@ -653,10 +661,37 @@ QString cd_gui::loadTimeOutMsg(){
 
 //load previous saved time remaining
 int cd_gui::loadTimeRemain(){
+    //input to read timerem
     ifstream timeFile;
     string fileName = "timerem";
+    //remaining time
+    string time;
+    int t_remain;
     timeFile.open(fileName);
     if (timeFile.is_open()){
+        cout << "Load " << fileName << " successful." << endl;
+        getline(timeFile, time);
 
+        //turn string to int
+        t_remain = stoi(time);
+        timeFile.close();
+    } else {
+        cout << "Failed to load " << fileName << endl;
+        t_remain = 60;
+        ofstream timeFile (fileName);
+        timeFile << t_remain;
+        timeFile.close();
+        cout << "Created new " << fileName << endl;
     }
+    return t_remain;
+}
+
+//save previous saved time remaining
+void cd_gui::saveTimeRemain(){
+    ofstream timeFile;
+    string fileName = "timerem";
+    timeFile.open(fileName);
+    timeFile << t;
+    timeFile.close();
+    cout << "Saved " << t << "." << endl;
 }
