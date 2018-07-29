@@ -607,7 +607,7 @@ void cd_gui::ledTimeChange(){
 void cd_gui::buttonRead(){
     //start and stop countdown
     if ( gpio_read(GPIO_MODULE2, IN, USR0_KEY_SW1) ){
-        if (!timer->isActive()){
+        if (!timer->isActive() && !sp){
             on_startTime_clicked();
         } else {
             on_stopTime_clicked();
