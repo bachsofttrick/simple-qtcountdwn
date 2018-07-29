@@ -221,6 +221,9 @@ void initial_iosetup ()
 
     printf("main: Keys set as inputs successfully\n");
 
+    //set LED D1 to inform that io setup is successful
+    gpio_set(GPIO_MODULE1, USR0_LED_D1);
+
     //This part is for reference for action of button and LED.
     /*while (1) {
         if (1 == gpio_read(GPIO_MODULE2, IN, USR0_KEY_SW1) )

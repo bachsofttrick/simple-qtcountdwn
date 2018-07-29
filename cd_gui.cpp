@@ -103,6 +103,7 @@ void cd_gui::on_speedSet_clicked(){
 //action for x button
 void cd_gui::on_exit_clicked()
 {
+    saveTimeRemain();
     qApp->quit(); //quit
     unmap_io();
     cout << "." << endl;
@@ -718,8 +719,10 @@ QString cd_gui::loadTimeOutMsg(){
             cout << "File is empty. Use default message." << endl;
             msg = "Time's up";
         }
-
         fileText.close();
+
+        //set LED D2 to inform that message.txt is loaded
+        gpio_set(GPIO_MODULE1, USR1_LED_D2);
      } else {
         cout << "Failed to load " << fileName << endl;
         cout << "Proceed with default timeout message." << endl;
@@ -749,6 +752,9 @@ int cd_gui::loadTimeRemain(){
         //turn string to int
         t_remain = stoi(time);
         timeFile.close();
+
+        //set LED D3 to inform that timerem is loaded
+        gpio_set(GPIO_MODULE1, USR2_LED_D3);
     } else {
         cout << "Failed to load " << fileName << endl;
         t_remain = 60;
