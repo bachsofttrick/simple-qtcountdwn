@@ -612,6 +612,11 @@ void cd_gui::buttonRead(){
         } else {
             on_stopTime_clicked();
         }
+     //reset speed when in speed settings
+        if (!timer->isActive() && sp){
+            speed = 1000;
+            configButtonOnSpeed();
+        }
     }
 
     if ( gpio_read(GPIO_MODULE2, IN, USR1_KEY_SW2) )
