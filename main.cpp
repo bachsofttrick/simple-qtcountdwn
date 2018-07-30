@@ -3,7 +3,6 @@
 
 int main(int argc, char *argv[])
 {
-    cout << "Initialize value: ";
     QApplication a(argc, argv);
     cd_gui w;
     short int size;

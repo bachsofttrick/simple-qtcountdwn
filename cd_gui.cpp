@@ -8,7 +8,6 @@ cd_gui::cd_gui(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->stopTime->setEnabled(0); //disable stop button in startup
-    resetTime(); //reset Timer
     t = loadTimeRemain(); //load previous time value
     updateDisplay(); //update display
 
@@ -602,7 +601,7 @@ int cd_gui::loadTimeRemain(){
         cout << "Created new " << fileName << endl;
     }
     //prevent time overflow
-    if (t < 0 || t > 8640000){
+    if (t_remain < 0 || t_remain > 8640000){
         cout << "Value out of bound (0 < t < 8640000)" << endl;
         t_remain = 60;
         ofstream timeFile (fileName);
