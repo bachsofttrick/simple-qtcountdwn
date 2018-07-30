@@ -8,6 +8,10 @@ cd_gui::cd_gui(QWidget *parent) :
     ui(new Ui::cd_gui)
 {
     ui->setupUi(this);
+
+    //setup for LEDs and buttons
+    initial_iosetup();
+
     ui->stopTime->setEnabled(0); //disable stop button in startup
     resetTime(); //reset Timer
     t = loadTimeRemain(); //load previous time value
@@ -17,8 +21,7 @@ cd_gui::cd_gui(QWidget *parent) :
     button = new QTimer(this);
     connect(button, SIGNAL(timeout()), this, SLOT(buttonRead()));
     button->start(180);
-    //setup for LEDs and buttons
-    initial_iosetup();
+
 
     //initialize timer for countdown (not active)
     timer = new QTimer(this);
@@ -610,7 +613,7 @@ void cd_gui::buttonRead(){
     if ( gpio_read(GPIO_MODULE2, IN, USR0_KEY_SW1) ){
         if (!timer->isActive() && !sp){
             on_startTime_clicked();
-        } else {
+        } else if (timer->isActive() && !sp){
             on_stopTime_clicked();
         }
      //reset speed when in speed settings
