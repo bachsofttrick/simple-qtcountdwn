@@ -762,7 +762,7 @@ int cd_gui::loadTimeRemain(){
         cout << "Created new " << fileName << endl;
     }
     //prevent time overflow
-    if (t < 0 || t > 8640000){
+    if (t_remain < 0 || t_remain > 8640000){
         cout << "Value out of bound (0 < t < 8640000)" << endl;
         t_remain = 60;
         ofstream timeFile (fileName);
