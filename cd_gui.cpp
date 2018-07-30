@@ -8,12 +8,7 @@ cd_gui::cd_gui(QWidget *parent) :
     ui(new Ui::cd_gui)
 {
     ui->setupUi(this);
-
-    //setup for LEDs and buttons
-    initial_iosetup();
-
     ui->stopTime->setEnabled(0); //disable stop button in startup
-    resetTime(); //reset Timer
     t = loadTimeRemain(); //load previous time value
     updateDisplay(); //update display
 

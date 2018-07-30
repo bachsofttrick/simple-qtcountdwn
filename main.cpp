@@ -1,9 +1,12 @@
 #include "cd_gui.h"
+#include "blink-led.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
-    cout << "Initialize value: ";
+    //setup for LEDs and buttons
+    initial_iosetup();
+
     QApplication a(argc, argv);
     cd_gui w;
     short int size;
