@@ -81,6 +81,7 @@ void cd_gui::on_speedSet_clicked(){
 //action for x button
 void cd_gui::on_exit_clicked()
 {
+    saveTimeRemain();
     qApp->quit(); //quit
     cout << "." << endl;
 }
@@ -590,7 +591,13 @@ int cd_gui::loadTimeRemain(){
         getline(timeFile, time);
 
         //turn string to int
-        t_remain = stoi(time);
+        //first check for value to not exceed int
+        if (time.size() < 10){
+            t_remain = stoi(time);
+        } else {
+            cout << "Exceed character number." << endl;
+            t_remain = 60;
+        }
         timeFile.close();
     } else {
         cout << "Failed to load " << fileName << endl;
