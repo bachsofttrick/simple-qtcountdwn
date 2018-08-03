@@ -748,7 +748,13 @@ int cd_gui::loadTimeRemain(){
         getline(timeFile, time);
 
         //turn string to int
-        t_remain = stoi(time);
+        //first check for value to not exceed int
+        if (time.size() < 10){
+            t_remain = stoi(time);
+        } else {
+            cout << "Exceed character number." << endl;
+            t_remain = 60;
+        }
         timeFile.close();
 
         //set LED D3 to inform that timerem is loaded
